@@ -1,116 +1,118 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const numbersContainer = document.getElementById('numbers-container');
-    const levelInfo = document.getElementById('level-info');
-    const scoreInfo = document.getElementById('score-info');
-    const multiplierInfo = document.getElementById('multiplier-info');
-    const errorsContainer = document.getElementById('errors-container');
-    const timerInfo = document.getElementById('timer-info');
-    const targetInfo = document.getElementById('target-info');
-    const targetNumberElement = document.getElementById('target-number');
-    const gameOverContainer = document.getElementById('game-over-container');
-    const finalScore = document.getElementById('final-score');
-    const highScore = document.getElementById('high-score');
-    const restartButton = document.getElementById('restart-button');
-    const startButton = document.getElementById('start-button');
-    const startScreen = document.getElementById('start-screen');
-    const gameContainer = document.getElementById('game-container');
-    const gameFrame = document.getElementById('game-frame');
-    const correctIcon = document.getElementById('correct-icon');
+class NumberGame {
+    constructor() {
+        this.numbersContainer = document.getElementById('numbers-container');
+        this.levelInfo = document.getElementById('level-info');
+        this.scoreInfo = document.getElementById('score-info');
+        this.multiplierInfo = document.getElementById('multiplier-info');
+        this.errorsContainer = document.getElementById('errors-container');
+        this.timerInfo = document.getElementById('timer-info');
+        this.targetInfo = document.getElementById('target-info');
+        this.targetNumberElement = document.getElementById('target-number');
+        this.gameOverContainer = document.getElementById('game-over-container');
+        this.finalScore = document.getElementById('final-score');
+        this.highScore = document.getElementById('high-score');
+        this.restartButton = document.getElementById('restart-button');
+        this.startButton = document.getElementById('start-button');
+        this.startScreen = document.getElementById('start-screen');
+        this.gameContainer = document.getElementById('game-container');
+        this.gameFrame = document.getElementById('game-frame');
+        this.correctIcon = document.getElementById('correct-icon');
 
-    let level = 1;
-    let score = 0;
-    let multiplier = 1;
-    let errors = 0;
-    let targetNumber;
-    let timer;
-    let timeLeft = 120;
-    let highScoreValue = 0;
+        this.level = 1;
+        this.score = 0;
+        this.multiplier = 1;
+        this.errors = 0;
+        this.targetNumber = null;
+        this.timer = null;
+        this.timeLeft = 120;
+        this.highScoreValue = 0;
 
-    startButton.addEventListener('click', startGame);
-    restartButton.addEventListener('click', startGame);
-
-    function startGame() {
-        level = 1;
-        score = 0;
-        multiplier = 1;
-        errors = 0;
-        timeLeft = 120;
-        updateLevelInfo();
-        updateScoreInfo();
-        updateMultiplierInfo();
-        updateErrorsInfo();
-        updateTimerInfo();
-        generateNumbers();
-        startTimer();
-        gameOverContainer.style.display = 'none';
-        gameContainer.style.display = 'block';
-        startScreen.style.display = 'none';
-        changeFrameColor();
+        this.startButton.addEventListener('click', () => this.startGame());
+        this.restartButton.addEventListener('click', () => this.startGame());
     }
 
-    function updateLevelInfo() {
-        levelInfo.textContent = `LVL: ${level}`;
+    startGame() {
+        this.level = 1;
+        this.score = 0;
+        this.multiplier = 1;
+        this.errors = 0;
+        this.timeLeft = 120;
+        this.updateLevelInfo();
+        this.updateScoreInfo();
+        this.updateMultiplierInfo();
+        this.updateErrorsInfo();
+        this.updateTimerInfo();
+        this.generateNumbers();
+        this.startTimer();
+        this.gameOverContainer.style.display = 'none';
+        this.gameContainer.style.display = 'block';
+        this.startScreen.style.display = 'none';
+        this.changeFrameColor();
     }
 
-    function updateScoreInfo() {
-        scoreInfo.textContent = `Очки: ${score}`;
+    updateLevelInfo() {
+        this.levelInfo.textContent = `LVL: ${this.level}`;
     }
 
-    function updateMultiplierInfo() {
-        multiplierInfo.textContent = `Множитель: x${multiplier}`;
+    updateScoreInfo() {
+        this.scoreInfo.textContent = `Очки: ${this.score}`;
     }
 
-    function updateErrorsInfo() {
+    updateMultiplierInfo() {
+        this.multiplierInfo.textContent = `Множитель: x${this.multiplier}`;
+    }
+
+    updateErrorsInfo() {
         document.querySelectorAll('.error').forEach(error => {
             error.classList.remove('active');
         });
-        for (let i = 1; i <= errors; i++) {
+        for (let i = 1; i <= this.errors; i++) {
             document.getElementById(`error-${i}`).classList.add('active');
         }
     }
 
-    function updateTimerInfo() {
-        const minutes = Math.floor(timeLeft / 60);
-        const seconds = timeLeft % 60;
-        timerInfo.textContent = `Время: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    updateTimerInfo() {
+        const minutes = Math.floor(this.timeLeft / 60);
+        const seconds = this.timeLeft % 60;
+        this.timerInfo.textContent = `Время: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }
 
-    function updateTargetInfo() {
-        targetInfo.textContent = `Найдите число: `;
-        targetNumberElement.textContent = targetNumber;
+    updateTargetInfo() {
+        this.targetInfo.textContent = `Найдите число: `;
+        this.targetNumberElement.textContent = this.targetNumber;
     }
 
-    function generateNumbers() {
-        numbersContainer.innerHTML = '';
+    generateNumbers() {
+        this.numbersContainer.innerHTML = '';
         let numbersCount;
         let numberRange;
         let gridSize;
         let gapSize;
 
-        if (level <= 3) {
+        if (this.level <= 3) {
             numbersCount = 6;
             numberRange = [1, 10];
             gridSize = { rows: 2, cols: 3 };
-            gapSize = 20; 
-        } else if (level <= 8) {
+            gapSize = 20;
+        } else if (this.level <= 8) {
             numbersCount = 16;
             numberRange = [100, 1000];
             gridSize = { rows: 4, cols: 4 };
-            gapSize = 15; 
+            gapSize = 15;
         } else {
             numbersCount = 25;
             numberRange = [1000, 10000];
             gridSize = { rows: 5, cols: 5 };
-            gapSize = 10; 
+            gapSize = 10;
         }
 
-        numbersContainer.style.gridTemplateRows = `repeat(${gridSize.rows}, 1fr)`;
-        numbersContainer.style.gridTemplateColumns = `repeat(${gridSize.cols}, 1fr)`;
-        numbersContainer.style.gap = `${gapSize}px`;
+        this.numbersContainer.style.gridTemplateRows = `repeat(${gridSize.rows}, 1fr)`;
+        this.numbersContainer.style.gridTemplateColumns = `repeat(${gridSize.cols}, 1fr)`;
+        this.numbersContainer.style.gap = `${gapSize}px`;
 
-        const numbers = generateRandomNumbers(numbersCount, numberRange);
-        targetNumber = numbers[Math.floor(Math.random() * numbers.length)];
-        updateTargetInfo();
+        const numbers = this.generateRandomNumbers(numbersCount, numberRange);
+        this.targetNumber = numbers[Math.floor(Math.random() * numbers.length)];
+        this.updateTargetInfo();
 
         numbers.forEach(number => {
             const numberElement = document.createElement('div');
@@ -120,9 +122,9 @@ document.addEventListener('DOMContentLoaded', () => {
             numberSpan.textContent = number;
             numberElement.appendChild(numberSpan);
 
-            numberElement.addEventListener('click', () => checkNumber(number));
+            numberElement.addEventListener('click', () => this.checkNumber(number));
 
-            if (level >= 3 && Math.random() < 0.5) { 
+            if (this.level >= 3 && Math.random() < 0.5) {
                 const randomEffect = Math.floor(Math.random() * 3);
                 if (randomEffect === 0) {
                     numberElement.classList.add('blink');
@@ -133,14 +135,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const randomColor = getRandomColor();
+            const randomColor = this.getRandomColor();
             numberElement.classList.add(randomColor);
 
-            numbersContainer.appendChild(numberElement);
+            this.numbersContainer.appendChild(numberElement);
         });
     }
 
-    function generateRandomNumbers(count, range) {
+    generateRandomNumbers(count, range) {
         const numbers = new Set();
         while (numbers.size < count) {
             const number = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
@@ -149,81 +151,85 @@ document.addEventListener('DOMContentLoaded', () => {
         return Array.from(numbers);
     }
 
-    function checkNumber(number) {
-        if (number === targetNumber) {
-            score += 10 * level * multiplier;
-            updateScoreInfo();
-            level++;
-            if (level % 2 === 0 && multiplier < 5) {
-                multiplier++;
+    checkNumber(number) {
+        if (number === this.targetNumber) {
+            this.score += 10 * this.level * this.multiplier;
+            this.updateScoreInfo();
+            this.level++;
+            if (this.level % 2 === 0 && this.multiplier < 5) {
+                this.multiplier++;
             }
-            updateMultiplierInfo();
-            updateLevelInfo();
-            changeFrameColor();
+            this.updateMultiplierInfo();
+            this.updateLevelInfo();
+            this.changeFrameColor();
 
-            correctIcon.style.display = 'block';
+            this.correctIcon.style.display = 'block';
             setTimeout(() => {
-                correctIcon.style.display = 'none';
-                generateNumbers();
-                targetNumberElement.classList.add('swipe-transition');
+                this.correctIcon.style.display = 'none';
+                this.generateNumbers();
+                this.targetNumberElement.classList.add('swipe-transition');
                 document.querySelectorAll('.number').forEach(numberElement => {
                     numberElement.classList.add('swipe-transition');
                 });
                 setTimeout(() => {
-                    targetNumberElement.classList.remove('swipe-transition');
+                    this.targetNumberElement.classList.remove('swipe-transition');
                     document.querySelectorAll('.number').forEach(numberElement => {
                         numberElement.classList.remove('swipe-transition');
                     });
-                }, 500); 
-            }, 500); 
+                }, 500);
+            }, 500);
         } else {
-            errors++;
-            updateErrorsInfo();
-            multiplier = 1; 
-            updateMultiplierInfo();
-            if (errors >= 3) {
-                endGame();
+            this.errors++;
+            this.updateErrorsInfo();
+            this.multiplier = 1;
+            this.updateMultiplierInfo();
+            if (this.errors >= 3) {
+                this.endGame();
             }
         }
     }
 
-    function startTimer() {
-        clearInterval(timer);
-        timer = setInterval(() => {
-            timeLeft--;
-            updateTimerInfo();
-            if (timeLeft <= 0) {
-                endGame();
+    startTimer() {
+        clearInterval(this.timer);
+        this.timer = setInterval(() => {
+            this.timeLeft--;
+            this.updateTimerInfo();
+            if (this.timeLeft <= 0) {
+                this.endGame();
             }
         }, 1000);
     }
 
-    function endGame() {
-        clearInterval(timer);
-        if (score > highScoreValue) {
-            highScoreValue = score;
+    endGame() {
+        clearInterval(this.timer);
+        if (this.score > this.highScoreValue) {
+            this.highScoreValue = this.score;
         }
-        highScore.textContent = `Рекорд: ${highScoreValue}`;
-        finalScore.textContent = `Очки: ${score}`;
-        gameOverContainer.style.display = 'flex';
-        gameContainer.style.display = 'none';
+        this.highScore.textContent = `Рекорд: ${this.highScoreValue}`;
+        this.finalScore.textContent = `Очки: ${this.score}`;
+        this.gameOverContainer.style.display = 'flex';
+        this.gameContainer.style.display = 'none';
     }
 
-    function changeFrameColor() {
-        const randomColor = getRandomPleasantColor();
-        gameFrame.style.backgroundColor = randomColor;
+    changeFrameColor() {
+        const randomColor = this.getRandomPleasantColor();
+        this.gameFrame.style.backgroundColor = randomColor;
     }
 
-    function getRandomColor() {
+    getRandomColor() {
         const colors = ['pink', 'orange', 'blue', 'green', 'purple'];
         return colors[Math.floor(Math.random() * colors.length)];
     }
 
-    function getRandomPleasantColor() {
+    getRandomPleasantColor() {
         const colors = [
             '#FF5733', '#33FF57', '#3357FF', '#F333FF', '#FFFF33',
             '#57FF33', '#5733FF', '#FF33A1', '#33FFA1', '#A133FF'
         ];
         return colors[Math.floor(Math.random() * colors.length)];
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    new NumberGame();
 });
